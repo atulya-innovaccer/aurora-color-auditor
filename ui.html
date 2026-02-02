@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aurora</title>
+  <style>
+    :root {
+      --figma-color-bg: #2c2c2c;
+      --figma-color-bg-secondary: #383838;
+      --figma-color-bg-tertiary: #444444;
+      --figma-color-bg-hover: #4a4a4a;
+      --figma-color-border: #444444;
+      --figma-color-border-strong: #5c5c5c;
+      --figma-color-text: #ffffff;
+      --figma-color-text-secondary: #b3b3b3;
+      --figma-color-text-tertiary: #8c8c8c;
+      --figma-color-brand: #0d99ff;
+      --figma-color-brand-hover: #0b87e0;
+      --figma-color-success: #14ae5c;
+      --figma-color-success-bg: rgba(20, 174, 92, 0.12);
+      --figma-color-error: #f24822;
+      --figma-color-error-bg: rgba(242, 72, 34, 0.12);
+      --figma-color-warning: #ffb224;
+      --figma-color-warning-bg: rgba(255, 178, 36, 0.12);
+      --figma-color-complex: #a259ff;
+      --figma-color-complex-bg: rgba(162, 89, 255, 0.12);
+      --figma-color-broken: #FF8C00;
+      --figma-color-broken-bg: rgba(255, 140, 0, 0.15);
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-size-xs: 10px;
+      --font-size-sm: 11px;
+      --font-size-md: 12px;
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 8px;
+      --radius-xl: 12px;
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 12px;
+      --space-lg: 16px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-family);
+      font-size: var(--font-size-md);
+      color: var(--figma-color-text);
+      background: var(--figma-color-bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      /* Important for Matrix Scroll */
+    }
+
+    .header {
+      padding: var(--space-lg);
+      border-bottom: 1px solid var(--figma-color-border);
+      background: var(--figma-color-bg-secondary);
+    }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-title {
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      cursor: pointer;
+    }
+
+    .header-icon {
+      width: 16px;
+      height: 16px;
+      background: linear-gradient(135deg, var(--figma-color-success), var(--figma-color-brand));
+      border-radius: 50%;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      font-family: inherit;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+
+    .btn-primary {
+      background: var(--figma-color-brand);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--figma-color-brand-hover);
+    }
+
+    .btn-secondary {
+      background: var(--figma-color-bg-tertiary);
+      color: var(--figma-color-text);
+      border: 1px solid var(--figma-color-border-strong);
+    }
+
+    .btn-secondary:hover {
+      background: var(--figma-color-bg-hover);
+    }
+
+    .btn-icon {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Small variants */
+    .btn-sm {
+      padding: 4px 8px;
+      font-size: var(--font-size-xs);
+    }
+
+    .filters-section {
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--figma-color-border);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .filter-label {
+      font-size: var(--font-size-sm);
+      color: var(--figma-color-text-tertiary);
+      min-width: 50px;
+    }
+
+    .chip-group {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      padding: 4px 10px;
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      font-family: inherit;
+      background: var(--figma-color-bg-tertiary);
+      color: var(--figma-color-text-secondary);
+      border: 1px solid transparent;
+      border-radius: 100px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .chip:hover {
+      background: var(--figma-color-bg-hover);
+      color: var(--figma-color-text);
+    }
+
+    .chip.active {
+      background: var(--figma-color-brand);
+      color: white;
+    }
+
+    .chip-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .chip-dot.pass {
+      background: var(--figma-color-success);
+    }
+
+    .chip-dot.fail {
+      background: var(--figma-color-error);
+    }
+
+    .chip-dot.warning {
+      background: var(--figma-color-warning);
+    }
+
+    .chip-dot.complex {
+      background: var(--figma-color-complex);
+    }
+
+    .stats-bar {
+      padding: var(--space-sm) var(--space-lg);
+      background: var(--figma-color-bg-secondary);
+      border-bottom: 1px solid var(--figma-color-border);
+      display: none;
+      gap: var(--space-lg);
+      font-size: var(--font-size-sm);
+    }
+
+    .stats-bar.visible {
+      display: flex;
+    }
+
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stat-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .stat-dot.pass {
+      background: var(--figma-color-success);
+    }
+
+    .stat-dot.fail {
+      background: var(--figma-color-error);
+    }
+
+    .stat-dot.warning {
+      background: var(--figma-color-warning);
+    }
+
+    .stat-dot.complex {
+      background: var(--figma-color-complex);
+    }
+
+    .export-bar {
+      padding: var(--space-sm) var(--space-lg);
+      background: var(--figma-color-bg-secondary);
+      border-bottom: 1px solid var(--figma-color-border);
+      display: none;
+    }
+
+    .export-bar.visible {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
+    }
+
+    .colors-found {
+      font-size: var(--font-size-sm);
+      color: var(--figma-color-text-secondary);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .colors-found strong {
+      color: var(--figma-color-text);
+    }
+
+    .export-actions {
+      display: flex;
+      gap: var(--space-xs);
+    }
+
+    /* Main Content Area */
+    .content-area {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .results-container {
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      padding: var(--space-sm);
+      position: absolute;
+      top: 0;
+      left: 0;
+      transition: transform 0.3s ease;
+    }
+
+    .results-container.hidden {
+      transform: translateX(-100%);
+    }
+
+    /* Matrix View */
+    .matrix-view {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: var(--figma-color-bg);
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 10;
+    }
+
+    .matrix-view.visible {
+      transform: translateX(0);
+    }
+
+    .matrix-toolbar {
+      padding: var(--space-md);
+      border-bottom: 1px solid var(--figma-color-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--figma-color-bg-secondary);
+    }
+
+    .matrix-title {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .matrix-scroll-area {
+      flex: 1;
+      overflow: auto;
+      padding: var(--space-lg);
+      position: relative;
+    }
+
+    /* Matrix Grid */
+    .matrix-grid {
+      display: grid;
+      gap: 2px;
+    }
+
+    .matrix-cell {
+      position: relative;
+      width: 32px;
+      height: 32px;
+      border-radius: 2px;
+      cursor: default;
+      transition: transform 0.1s;
+    }
+
+    .matrix-cell.interactive {
+      cursor: pointer;
+    }
+
+    .matrix-cell:hover {
+      transform: scale(1.2);
+      z-index: 20;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      border: 1px solid white;
+    }
+
+    .matrix-header-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: 4px;
+      font-size: 9px;
+      color: var(--figma-color-text-tertiary);
+    }
+
+    .matrix-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 8px;
+      font-size: 10px;
+      color: var(--figma-color-text-secondary);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .matrix-swatch-mini {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      margin-left: 4px;
+      border: 1px solid var(--figma-color-border-strong);
+    }
+
+    .matrix-swatch-col {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      margin-top: 4px;
+      border: 1px solid var(--figma-color-border-strong);
+    }
+
+    /* Tooltip */
+    .tooltip {
+      position: fixed;
+      display: none;
+      background: var(--figma-color-bg-secondary);
+      border: 1px solid var(--figma-color-border-strong);
+      border-radius: var(--radius-lg);
+      padding: var(--space-md);
+      z-index: 100;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      width: 200px;
+    }
+
+    .tooltip.visible {
+      display: block;
+    }
+
+    .tooltip-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--figma-color-border);
+      padding-bottom: var(--space-xs);
+    }
+
+    .tooltip-rating {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .tooltip-rating.AAA {
+      color: var(--figma-color-success);
+    }
+
+    .tooltip-rating.AA {
+      color: var(--figma-color-brand);
+    }
+
+    .tooltip-rating.Fail {
+      color: var(--figma-color-error);
+    }
+
+    .tooltip-ratio {
+      font-family: monospace;
+      font-size: 14px;
+      color: var(--figma-color-text-secondary);
+    }
+
+    .tooltip-colors {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    .tooltip-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .tooltip-swatch {
+      width: 16px;
+      height: 16px;
+      border-radius: 2px;
+      border: 1px solid var(--figma-color-border-strong);
+    }
+
+    .tooltip-info {
+      font-size: 10px;
+      color: var(--figma-color-text-secondary);
+    }
+
+    .tooltip-name {
+      font-weight: 600;
+      color: var(--figma-color-text);
+    }
+
+
+    /* List View Components */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--figma-color-text-secondary);
+    }
+
+    .empty-icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: var(--space-lg);
+      opacity: 0.4;
+    }
+
+    .empty-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--figma-color-text);
+      margin-bottom: 6px;
+    }
+
+    .empty-desc {
+      font-size: var(--font-size-sm);
+      max-width: 240px;
+      line-height: 1.5;
+    }
+
+    .result-item {
+      background: var(--figma-color-bg-secondary);
+      border: 1px solid var(--figma-color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-md);
+      margin-bottom: var(--space-sm);
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+
+    .result-item:hover {
+      background: var(--figma-color-bg-tertiary);
+      border-color: var(--figma-color-brand);
+    }
+
+    .result-item.status-fail {
+      border-left: 3px solid var(--figma-color-error);
+    }
+
+    .result-item.status-pass {
+      border-left: 3px solid var(--figma-color-success);
+    }
+
+    .result-item.status-warning {
+      border-left: 3px solid var(--figma-color-warning);
+    }
+
+    .result-item.status-complex {
+      border-left: 3px solid var(--figma-color-complex);
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-sm);
+    }
+
+    .result-name {
+      font-size: var(--font-size-md);
+      font-weight: 500;
+      max-width: 180px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .result-tags {
+      display: flex;
+      gap: 4px;
+    }
+
+    .result-tag {
+      font-size: 9px;
+      color: var(--figma-color-text-tertiary);
+      background: var(--figma-color-bg);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .result-tag.text-scale {
+      color: var(--figma-color-brand);
+      background: rgba(13, 153, 255, 0.15);
+    }
+
+    .result-colors {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-md);
+      margin-bottom: var(--space-sm);
+    }
+
+    .color-pair {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .color-label {
+      font-size: var(--font-size-xs);
+      color: var(--figma-color-text-tertiary);
+      width: 20px;
+      padding-top: 4px;
+    }
+
+    .color-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .color-swatch {
+      width: 24px;
+      height: 24px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--figma-color-border-strong);
+    }
+
+    .color-hex {
+      font-size: var(--font-size-sm);
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+      color: var(--figma-color-text-secondary);
+    }
+
+    .color-token {
+      font-size: var(--font-size-xs);
+      color: var(--figma-color-brand);
+      max-width: 120px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .color-nearest {
+      font-size: var(--font-size-xs);
+      color: var(--figma-color-broken);
+    }
+
+    .result-metrics {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .contrast-ratio {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .contrast-ratio-label {
+      font-size: var(--font-size-xs);
+      color: var(--figma-color-text-tertiary);
+      margin-left: 4px;
+      font-weight: 400;
+    }
+
+    .badges {
+      display: flex;
+      gap: 4px;
+    }
+
+    .badge {
+      padding: 3px 8px;
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+    }
+
+    .badge-pass {
+      background: var(--figma-color-success-bg);
+      color: var(--figma-color-success);
+    }
+
+    .badge-fail {
+      background: var(--figma-color-error-bg);
+      color: var(--figma-color-error);
+    }
+
+    .badge-warning {
+      background: var(--figma-color-warning-bg);
+      color: var(--figma-color-warning);
+    }
+
+    .badge-complex {
+      background: var(--figma-color-complex-bg);
+      color: var(--figma-color-complex);
+    }
+
+    .badge-broken {
+      background: var(--figma-color-broken-bg);
+      color: var(--figma-color-broken);
+    }
+
+    .wcag-guideline {
+      margin-top: var(--space-sm);
+      padding-top: var(--space-sm);
+      border-top: 1px solid var(--figma-color-border);
+      font-size: var(--font-size-xs);
+      line-height: 1.4;
+    }
+
+    .wcag-criterion {
+      color: var(--figma-color-text-secondary);
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+
+    .wcag-description {
+      color: var(--figma-color-text-tertiary);
+    }
+
+    .wcag-recommendation {
+      color: var(--figma-color-warning);
+      margin-top: 4px;
+    }
+
+    .text-info {
+      font-size: var(--font-size-xs);
+      color: var(--figma-color-text-tertiary);
+      margin-top: var(--space-sm);
+      padding-top: var(--space-sm);
+      border-top: 1px solid var(--figma-color-border);
+    }
+
+    .decorative-info {
+      font-size: var(--font-size-xs);
+      color: var(--figma-color-warning);
+      margin-top: var(--space-xs);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .broken-info {
+      font-size: var(--font-size-xs);
+      color: var(--figma-color-broken);
+      margin-top: var(--space-xs);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 500;
+    }
+
+    .complex-message {
+      font-size: var(--font-size-sm);
+      color: var(--figma-color-complex);
+      margin-top: 6px;
+    }
+
+    .error-message {
+      display: none;
+      padding: var(--space-md) var(--space-lg);
+      background: var(--figma-color-error-bg);
+      color: var(--figma-color-error);
+      font-size: var(--font-size-md);
+    }
+
+    .error-message.visible {
+      display: block;
+    }
+
+    .results-container::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .results-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .results-container::-webkit-scrollbar-thumb {
+      background: var(--figma-color-border-strong);
+      border-radius: 4px;
+    }
+
+    .loading {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .loading.visible {
+      display: flex;
+    }
+
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--figma-color-border);
+      border-top-color: var(--figma-color-brand);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .no-results {
+      padding: 40px;
+      text-align: center;
+      color: var(--figma-color-text-tertiary);
+    }
+
+    /* Colors Modal Updated */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.visible {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--figma-color-bg-secondary);
+      border-radius: var(--radius-lg);
+      width: 90%;
+      max-width: 400px;
+      max-height: 80%;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--figma-color-text-tertiary);
+      text-transform: uppercase;
+      margin: var(--space-lg) 0 var(--space-xs) 0;
+      padding-left: var(--space-xs);
+    }
+
+    .modal-section-title:first-child {
+      margin-top: 0;
+    }
+
+    .color-list-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-sm);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-xs);
+      background: var(--figma-color-bg-tertiary);
+    }
+
+    .color-list-item.broken {
+      border: 1px solid var(--figma-color-broken);
+      background: rgba(255, 140, 0, 0.05);
+    }
+
+    .color-list-swatch {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--figma-color-border-strong);
+      flex-shrink: 0;
+    }
+
+    .color-list-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .color-list-hex {
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+      font-size: var(--font-size-md);
+      color: var(--figma-color-text);
+    }
+
+    .color-list-token {
+      font-size: var(--font-size-sm);
+      color: var(--figma-color-brand);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .color-list-nearest {
+      font-size: var(--font-size-xs);
+      color: var(--figma-color-broken);
+      margin-top: 2px;
+    }
+
+    .color-list-nearest-swatch {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+
+    .modal-header {
+      padding: var(--space-lg);
+      border-bottom: 1px solid var(--figma-color-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-md);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <div class="header-row">
+      <div class="header-title" id="appTitle">
+        <div class="header-icon"></div>Aurora
+      </div>
+      <button class="btn btn-primary" id="scanBtn">
+        <svg class="btn-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="7" cy="7" r="4" />
+          <path d="M11 11l3 3" />
+        </svg>
+        Scan
+      </button>
+    </div>
+  </div>
+
+  <div class="filters-section">
+    <div class="filter-row">
+      <span class="filter-label">Type</span>
+      <div class="chip-group" id="typeFilters">
+        <button class="chip active" data-type="all">All</button>
+        <button class="chip" data-type="text">Text</button>
+        <button class="chip" data-type="shape">Shapes</button>
+        <button class="chip" data-type="frame">Frames</button>
+      </div>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">Status</span>
+      <div class="chip-group" id="statusFilters">
+        <button class="chip active" data-status="all">All</button>
+        <button class="chip" data-status="fail"><span class="chip-dot fail"></span>Fail</button>
+        <button class="chip" data-status="warning"><span class="chip-dot warning"></span>Warning</button>
+        <button class="chip" data-status="pass"><span class="chip-dot pass"></span>Pass</button>
+        <button class="chip" data-status="complex"><span class="chip-dot complex"></span>Complex</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="error-message" id="errorMessage"></div>
+
+  <div class="stats-bar" id="statsBar">
+    <div class="stat"><span class="stat-dot fail"></span><span id="failCount">0</span> Fail</div>
+    <div class="stat"><span class="stat-dot warning"></span><span id="warningCount">0</span> Warning</div>
+    <div class="stat"><span class="stat-dot pass"></span><span id="passCount">0</span> Pass</div>
+    <div class="stat"><span class="stat-dot complex"></span><span id="complexCount">0</span> Complex</div>
+  </div>
+
+  <div class="export-bar" id="exportBar">
+    <div class="colors-found">
+      <strong id="uniqueColorsCount">0</strong> colors
+      <button class="btn btn-secondary btn-sm" id="viewColorsBtn">View</button>
+    </div>
+    <div class="export-actions">
+      <button class="btn btn-secondary btn-sm" id="viewMatrixBtn">View Matrix</button>
+      <button class="btn btn-secondary btn-sm" id="exportBtn">Export JSON</button>
+    </div>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="content-area">
+    <div class="results-container" id="resultsContainer">
+      <div class="empty-state" id="emptyState">
+        <svg class="empty-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="8" y="8" width="32" height="32" rx="4" />
+          <path d="M16 20h16M16 28h10" />
+        </svg>
+        <div class="empty-title">Ready to Audit</div>
+        <div class="empty-desc">Select any element and click "Scan" to check contrast ratios.</div>
+      </div>
+      <div id="resultsList"></div>
+    </div>
+
+    <!-- Interactive Matrix View -->
+    <div class="matrix-view" id="matrixView">
+      <div class="matrix-toolbar">
+        <span class="matrix-title">Contrast Matrix</span>
+        <button class="btn btn-secondary btn-sm" id="closeMatrixBtn">Close</button>
+      </div>
+      <div class="matrix-scroll-area" id="matrixScrollArea">
+        <div class="matrix-grid" id="matrixGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Unique Colors Modal -->
+  <div class="modal-overlay" id="colorsModal">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">Colors Used</span>
+        <button class="modal-close" id="closeModal">&times;</button>
+      </div>
+      <div class="modal-body" id="colorsList"></div>
+    </div>
+  </div>
+
+  <!-- Matrix Tooltip -->
+  <div class="tooltip" id="tooltip"></div>
+
+  <script>
+    let allResults = [];
+    let uniqueColorsData = [];
+    let currentTypeFilter = 'all';
+    let currentStatusFilter = 'all';
+
+    const scanBtn = document.getElementById('scanBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const viewColorsBtn = document.getElementById('viewColorsBtn');
+    const viewMatrixBtn = document.getElementById('viewMatrixBtn');
+    const closeMatrixBtn = document.getElementById('closeMatrixBtn');
+    const matrixView = document.getElementById('matrixView');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const matrixGrid = document.getElementById('matrixGrid');
+    const tooltip = document.getElementById('tooltip');
+
+    const closeModal = document.getElementById('closeModal');
+    const colorsModal = document.getElementById('colorsModal');
+    const colorsList = document.getElementById('colorsList');
+
+    const errorMessage = document.getElementById('errorMessage');
+    const statsBar = document.getElementById('statsBar');
+    const exportBar = document.getElementById('exportBar');
+    const loading = document.getElementById('loading');
+    const emptyState = document.getElementById('emptyState');
+    const resultsList = document.getElementById('resultsList');
+
+    const passCount = document.getElementById('passCount');
+    const failCount = document.getElementById('failCount');
+    const warningCount = document.getElementById('warningCount');
+    const complexCount = document.getElementById('complexCount');
+    const uniqueColorsCount = document.getElementById('uniqueColorsCount');
+    const typeFilters = document.getElementById('typeFilters');
+    const statusFilters = document.getElementById('statusFilters');
+
+    // Button Listeners
+    scanBtn.addEventListener('click', () => {
+      showLoading(); hideError();
+      // Reset view to List when rescanning
+      matrixView.classList.remove('visible');
+      resultsContainer.classList.remove('hidden');
+      parent.postMessage({ pluginMessage: { type: 'scan' } }, '*');
+    });
+
+    exportBtn.addEventListener('click', () => { parent.postMessage({ pluginMessage: { type: 'export-matrix' } }, '*'); });
+    viewColorsBtn.addEventListener('click', () => { parent.postMessage({ pluginMessage: { type: 'get-unique-colors' } }, '*'); });
+
+    viewMatrixBtn.addEventListener('click', () => {
+      showLoading();
+      parent.postMessage({ pluginMessage: { type: 'get-matrix-data' } }, '*');
+    });
+
+    closeMatrixBtn.addEventListener('click', () => {
+      matrixView.classList.remove('visible');
+      resultsContainer.classList.remove('hidden');
+    });
+
+    closeModal.addEventListener('click', () => { colorsModal.classList.remove('visible'); });
+    colorsModal.addEventListener('click', (e) => { if (e.target === colorsModal) colorsModal.classList.remove('visible'); });
+
+    // Filter Chips
+    typeFilters.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        typeFilters.querySelector('.chip.active').classList.remove('active');
+        chip.classList.add('active');
+        currentTypeFilter = chip.dataset.type;
+        renderResults();
+      });
+    });
+    statusFilters.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        statusFilters.querySelector('.chip.active').classList.remove('active');
+        chip.classList.add('active');
+        currentStatusFilter = chip.dataset.status;
+        renderResults();
+      });
+    });
+
+    // Message Handler
+    window.onmessage = (event) => {
+      const msg = event.data.pluginMessage;
+      if (msg.type === 'error') { hideLoading(); showError(msg.message); return; }
+
+      if (msg.type === 'results') {
+        hideLoading(); allResults = msg.data; updateStats(); showResults(); renderResults();
+      }
+
+      if (msg.type === 'matrix-data') { downloadJSON(msg.data, 'color-matrix.json'); }
+
+      if (msg.type === 'matrix-data-display') {
+        hideLoading();
+        renderMatrix(msg.data);
+        resultsContainer.classList.add('hidden');
+        matrixView.classList.add('visible');
+      }
+
+      if (msg.type === 'unique-colors') {
+        uniqueColorsData = msg.data;
+        renderColorsModal();
+        colorsModal.classList.add('visible');
+      }
+    };
+
+    function showLoading() { loading.classList.add('visible'); }
+    function hideLoading() { loading.classList.remove('visible'); }
+    function showError(message) { errorMessage.textContent = message; errorMessage.classList.add('visible'); }
+    function hideError() { errorMessage.classList.remove('visible'); }
+    function showResults() { emptyState.style.display = 'none'; statsBar.classList.add('visible'); exportBar.classList.add('visible'); }
+
+    function updateStats() {
+      passCount.textContent = allResults.filter(r => r.status === 'pass').length;
+      failCount.textContent = allResults.filter(r => r.status === 'fail').length;
+      warningCount.textContent = allResults.filter(r => r.status === 'warning').length;
+      complexCount.textContent = allResults.filter(r => r.status === 'complex').length;
+      const colorSet = new Set();
+      allResults.forEach(r => { if (r.foreground) colorSet.add(r.foreground.hex); if (r.background) colorSet.add(r.background.hex); });
+      uniqueColorsCount.textContent = colorSet.size;
+    }
+
+    // --- COLORS MODAL RENDERER (Updated with Separation) ---
+    function renderColorsModal() {
+      // Separate colors
+      const dsColors = uniqueColorsData.filter(c => c.tokenName);
+      const offPaletteColors = uniqueColorsData.filter(c => !c.tokenName);
+
+      let html = '';
+
+      if (dsColors.length > 0) {
+        html += `<div class="modal-section-title">Design System Colors (${dsColors.length})</div>`;
+        html += dsColors.map(renderColorItem).join('');
+      }
+
+      if (offPaletteColors.length > 0) {
+        html += `<div class="modal-section-title" style="color:var(--figma-color-broken)">Off-Palette / Unknown (${offPaletteColors.length})</div>`;
+        html += offPaletteColors.map(c => renderColorItem(c, true)).join('');
+      }
+
+      colorsList.innerHTML = html;
+    }
+
+    function renderColorItem(color, isBroken = false) {
+      const nearestHtml = color.nearestDS && color.nearestDS.distance > 0
+        ? `<div class="color-list-nearest"><span class="color-list-nearest-swatch" style="background:${color.nearestDS.hex}"></span>Nearest: ${color.nearestDS.name} (Δ${Math.round(color.nearestDS.distance)})</div>`
+        : '';
+      const tokenHtml = color.tokenName ? `<div class="color-list-token">${color.tokenName}</div>` : '';
+
+      const brokenClass = isBroken ? 'broken' : '';
+
+      return `<div class="color-list-item ${brokenClass}">
+          <div class="color-list-swatch" style="background-color:${color.hex}"></div>
+          <div class="color-list-info">
+            <div class="color-list-hex">${color.hex}</div>
+            ${tokenHtml}
+            ${nearestHtml}
+          </div>
+        </div>`;
+    }
+
+    // --- MATRIX RENDERER (Updated Logic) ---
+    function renderMatrix(matrixData) {
+      const colors = matrixData.unique_colors;
+      const combinations = matrixData.combinations;
+
+      // Build lookup map
+      const map = {};
+      colors.forEach(bg => {
+        map[bg.hex] = {};
+        colors.forEach(fg => { map[bg.hex][fg.hex] = null; });
+      });
+
+      combinations.forEach(combo => {
+        if (map[combo.background]) map[combo.background][combo.foreground] = combo;
+      });
+
+      // Configure Grid
+      // Columns: 1 Header Column (120px) + N Color Columns (32px)
+      matrixGrid.style.gridTemplateColumns = `120px repeat(${colors.length}, 32px)`;
+      matrixGrid.innerHTML = ''; // basic clear
+
+      // 1. Top-Left Corner (Empty)
+      const topLeft = document.createElement('div');
+      topLeft.textContent = 'FG →';
+      topLeft.className = 'matrix-header-row';
+      topLeft.style.justifyContent = 'center';
+      matrixGrid.appendChild(topLeft);
+
+      // 2. Col Headers (Foregrounds)
+      colors.forEach(c => {
+        const h = document.createElement('div');
+        h.className = 'matrix-header-col';
+        h.innerHTML = `<div>${c.tokenName || c.hex.substr(0, 4)}</div><div class="matrix-swatch-col" style="background:${c.hex}"></div>`;
+        h.title = c.tokenName ? `${c.tokenName} (${c.hex})` : c.hex;
+        matrixGrid.appendChild(h);
+      });
+
+      // 3. Rows
+      colors.forEach(bg => {
+        // Row Header (Background)
+        const rowHead = document.createElement('div');
+        rowHead.className = 'matrix-header-row';
+        rowHead.innerHTML = `<span>${bg.tokenName || bg.hex}</span><div class="matrix-swatch-mini" style="background:${bg.hex}"></div>`;
+        rowHead.title = bg.tokenName ? `${bg.tokenName} (${bg.hex})` : bg.hex;
+        matrixGrid.appendChild(rowHead);
+
+        // Cells
+        colors.forEach(fg => {
+          const cell = document.createElement('div');
+          const data = map[bg.hex][fg.hex];
+
+          cell.className = 'matrix-cell';
+          cell.style.backgroundColor = bg.hex;
+          cell.dataset.bg = bg.hex;
+          cell.dataset.fg = fg.hex;
+
+          // Inner dot for FG
+          const dot = document.createElement('div');
+          dot.style.width = '8px';
+          dot.style.height = '8px';
+          dot.style.borderRadius = '50%';
+          dot.style.backgroundColor = fg.hex;
+          dot.style.position = 'absolute';
+          dot.style.top = '12px';
+          dot.style.left = '12px';
+          cell.appendChild(dot);
+
+          // Styling based on Pass/Fail
+          if (data) {
+            if (data.status === 'fail') {
+              cell.style.opacity = '0.3';
+            }
+
+            if (data.nodeIds && data.nodeIds.length > 0) {
+              cell.classList.add('interactive');
+              cell.addEventListener('click', () => {
+                parent.postMessage({ pluginMessage: { type: 'select-nodes', nodeIds: data.nodeIds } }, '*');
+              });
+            }
+
+            // Tooltip Events
+            cell.addEventListener('mouseenter', (e) => showTooltip(e, data, bg, fg));
+            cell.addEventListener('mouseleave', hideTooltip);
+          } else {
+            // Self or missing
+            cell.style.opacity = '0.1';
+          }
+
+          matrixGrid.appendChild(cell);
+        });
+      });
+    }
+
+    function showTooltip(e, data, bg, fg) {
+      const rect = e.target.getBoundingClientRect();
+
+      let ratingClass = data.rating.replace(' ', ''); // AA-Large -> AALarge
+      if (data.rating === 'AA-Large') ratingClass = 'AA'; // Map to color style
+
+      tooltip.innerHTML = `
+         <div class="tooltip-header">
+           <span class="tooltip-rating ${data.rating === 'Fail' ? 'Fail' : 'AAA'}">${data.rating}</span>
+           <span class="tooltip-ratio">${data.ratio}:1</span>
+         </div>
+         <div class="tooltip-colors">
+            <div class="tooltip-row">
+              <div class="tooltip-swatch" style="background:${bg.hex}"></div>
+              <div class="tooltip-info">
+                 <div class="tooltip-name">${bg.tokenName || 'Unknown'}</div>
+                 <div>${bg.hex} (BG)</div>
+              </div>
+            </div>
+            <div class="tooltip-row">
+              <div class="tooltip-swatch" style="background:${fg.hex}"></div>
+              <div class="tooltip-info">
+                 <div class="tooltip-name">${fg.tokenName || 'Unknown'}</div>
+                 <div>${fg.hex} (FG)</div>
+              </div>
+            </div>
+         </div>
+         ${data.nodeIds && data.nodeIds.length > 0 ? `<div style="margin-top:8px; font-size:10px; color:var(--figma-color-brand);">Click to select ${data.nodeIds.length} layer(s)</div>` : ''}
+       `;
+
+      // Position tooltip
+      let top = rect.bottom + 10;
+      let left = rect.left - 80;
+
+      // Boundary check
+      if (left < 10) left = 10;
+      if (top + 150 > window.innerHeight) top = rect.top - 150;
+
+      tooltip.style.top = `${top}px`;
+      tooltip.style.left = `${left}px`;
+      tooltip.classList.add('visible');
+    }
+
+    function hideTooltip() {
+      tooltip.classList.remove('visible');
+    }
+
+
+    // --- LIST VIEW RENDERER ---
+    function renderResults() {
+      let filtered = allResults;
+      if (currentTypeFilter !== 'all') filtered = filtered.filter(r => r.nodeCategory === currentTypeFilter);
+      if (currentStatusFilter !== 'all') filtered = filtered.filter(r => r.status === currentStatusFilter);
+      if (filtered.length === 0 && allResults.length > 0) { resultsList.innerHTML = '<div class="no-results">No results match current filters</div>'; return; }
+      resultsList.innerHTML = filtered.map(createResultItem).join('');
+      resultsList.querySelectorAll('.result-item').forEach(item => {
+        item.addEventListener('click', () => parent.postMessage({ pluginMessage: { type: 'select-node', nodeId: item.dataset.nodeId } }, '*'));
+      });
+    }
+
+    function createResultItem(result) {
+      const { nodeId, nodeName, nodeCategory, foreground, background, contrastRatio, passesAA, passesAAA, status, fontSize, fontWeight, isBold, isLargeText, textScaleName, isDecorative, decorativeReason, message, wcagGuideline, isBrokenColor, brokenColorReason } = result;
+      const categoryLabel = { 'text': 'TEXT', 'shape': 'SHAPE', 'frame': 'FRAME', 'other': 'OTHER' }[nodeCategory] || 'OTHER';
+
+      if (status === 'complex') {
+        return `<div class="result-item status-complex" data-node-id="${nodeId}">
+          <div class="result-header"><span class="result-name" title="${nodeName}">${truncate(nodeName, 22)}</span><div class="result-tags"><span class="result-tag">${categoryLabel}</span></div></div>
+          <div class="badges"><span class="badge badge-complex">⚠ Manual Check</span></div>
+          <div class="complex-message">${message || 'Complex fill detected'}</div>
+        </div>`;
+      }
+
+      const fgStyle = foreground ? `background-color: ${foreground.hex}` : 'background: #333';
+      const bgStyle = background ? `background-color: ${background.hex}` : 'background: #333';
+      const fgToken = foreground?.tokenName ? `<span class="color-token" title="${foreground.tokenName}">${foreground.tokenName}</span>` : '';
+      const bgToken = background?.tokenName ? `<span class="color-token" title="${background.tokenName}">${background.tokenName}</span>` : '';
+
+      const fgNearestClass = isBrokenColor && !foreground?.tokenName ? 'color-nearest' : 'color-nearest';
+      const fgNearest = foreground?.nearestDS && !foreground?.tokenName ? `<span class="${fgNearestClass}" title="Nearest DS color">→ ${foreground.nearestDS.name} (${Math.round(foreground.nearestDS.distance)})</span>` : '';
+      const bgNearest = background?.nearestDS && !background?.tokenName ? `<span class="${fgNearestClass}" title="Nearest DS color">→ ${background.nearestDS.name} (${Math.round(background.nearestDS.distance)})</span>` : '';
+
+      const textScaleTag = textScaleName ? `<span class="result-tag text-scale">${textScaleName}</span>` : '';
+
+      let textInfo = '';
+      if (nodeCategory === 'text' && fontSize !== null) {
+        textInfo = `<div class="text-info">${fontSize}px / ${fontWeight} ${isLargeText ? '(Large Text)' : ''}</div>`;
+      }
+
+      let decorativeInfo = isDecorative && decorativeReason ? `<div class="decorative-info">💡 ${decorativeReason}</div>` : '';
+      let brokenInfo = isBrokenColor && brokenColorReason ? `<div class="broken-info">⚠ Off-Palette: ${brokenColorReason}</div>` : '';
+
+      let wcagInfo = '';
+      if (wcagGuideline) {
+        const recHtml = wcagGuideline.recommendation ? `<div class="wcag-recommendation">${wcagGuideline.recommendation}</div>` : '';
+        wcagInfo = `<div class="wcag-guideline"><div class="wcag-criterion">${wcagGuideline.criterion}</div><div class="wcag-description">${wcagGuideline.description}</div>${recHtml}</div>`;
+      }
+
+      let badgesHtml = '';
+      if (isBrokenColor) {
+        badgesHtml += `<span class="badge badge-broken">Off-Palette</span> `;
+      }
+      badgesHtml += `<span class="badge ${passesAA ? 'badge-pass' : 'badge-fail'}">AA ${passesAA ? '✓' : '✗'}</span> `;
+      badgesHtml += `<span class="badge ${passesAAA ? 'badge-pass' : 'badge-fail'}">AAA ${passesAAA ? '✓' : '✗'}</span>`;
+
+      return `<div class="result-item status-${status}" data-node-id="${nodeId}">
+        <div class="result-header"><span class="result-name" title="${nodeName}">${truncate(nodeName, 22)}</span><div class="result-tags">${textScaleTag}<span class="result-tag">${categoryLabel}</span></div></div>
+        <div class="result-colors">
+          <div class="color-pair"><span class="color-label">FG</span><div class="color-swatch" style="${fgStyle}"></div><div class="color-info"><span class="color-hex">${foreground ? foreground.hex : 'N/A'}</span>${fgToken}${fgNearest}</div></div>
+          <div class="color-pair"><span class="color-label">BG</span><div class="color-swatch" style="${bgStyle}"></div><div class="color-info"><span class="color-hex">${background ? background.hex : 'N/A'}</span>${bgToken}${bgNearest}</div></div>
+        </div>
+        <div class="result-metrics">
+          <div class="contrast-ratio">${contrastRatio !== null ? contrastRatio.toFixed(2) : 'N/A'}<span class="contrast-ratio-label">: 1</span></div>
+          <div class="badges">
+            ${badgesHtml}
+          </div>
+        </div>
+        ${textInfo}${decorativeInfo}${brokenInfo}${wcagInfo}
+      </div>`;
+    }
+
+    function truncate(str, maxLen) { return str.length <= maxLen ? str : str.substring(0, maxLen - 1) + '…'; }
+    function downloadJSON(data, filename) {
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+
+</html>

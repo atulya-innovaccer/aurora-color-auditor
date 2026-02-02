@@ -1,0 +1,24 @@
+{
+    "name": "aurora-color-auditor",
+    "version": "1.0.0",
+    "description": "Internal Innovaccer tool for mapping and checking colors",
+    "main": "code.js",
+    "scripts": {
+        "build": "tsc",
+        "watch": "tsc --watch"
+    },
+    "keywords": [
+        "figma",
+        "plugin",
+        "accessibility",
+        "a11y",
+        "wcag",
+        "contrast"
+    ],
+    "author": "",
+    "license": "MIT",
+    "devDependencies": {
+        "@figma/plugin-typings": "^1.100.2",
+        "typescript": "^5.3.3"
+    }
+}
