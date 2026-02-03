@@ -92,6 +92,132 @@ const DS_COLOR_MAP = {
     '#FFFFFF': 'White',
     '#000000': 'Black',
 };
+// ============================================
+// SEMANTIC COLOR MAPPINGS
+// ============================================
+const SEMANTIC_COLOR_MAP = {
+    // Maps hex values to their semantic role
+    '#0070DD': { base: 'Jal', semantic: 'primary' },
+    '#D5D5D5': { base: 'Stone', semantic: 'secondary' },
+    '#2EA843': { base: 'Neem', semantic: 'success' },
+    '#D93737': { base: 'Mirch', semantic: 'alert' },
+    '#FFC208': { base: 'Haldi', semantic: 'warning' },
+    '#F07D00': { base: 'Tawak', semantic: 'accent1' },
+    '#7A53B2': { base: 'Jamun', semantic: 'accent2' },
+    '#3D51D4': { base: 'Neel', semantic: 'accent3' },
+    '#82C91E': { base: 'Nimbu', semantic: 'accent4' },
+    '#1F1F1F': { base: 'Night', semantic: 'inverse' },
+};
+// ============================================
+// TEXT COLOR TOKENS
+// ============================================
+const TEXT_COLOR_MAP = {
+    '#1F1F1F': 'text',
+    '#707070': 'text-subtle',
+    '#0070DD': 'text-link',
+    '#A6A6A6': 'text-disabled',
+    '#D93737': 'text-destructive',
+    '#FFFFFF': 'text-white',
+    '#2EA843': 'text-success',
+};
+const DS_COMPONENT_RULES = {
+    'Badge': [
+        // Solid appearances
+        { name: 'primary', backgrounds: ['#0070DD'], foregrounds: ['#FFFFFF'] },
+        { name: 'secondary', backgrounds: ['#E5E5E5'], foregrounds: ['#1F1F1F'] },
+        { name: 'success', backgrounds: ['#2EA843'], foregrounds: ['#FFFFFF'] },
+        { name: 'alert', backgrounds: ['#D93737'], foregrounds: ['#FFFFFF'] },
+        { name: 'warning', backgrounds: ['#FFC208'], foregrounds: ['#6B4A06'] },
+        { name: 'accent1', backgrounds: ['#F07D00'], foregrounds: ['#FFFFFF'] },
+        { name: 'accent2', backgrounds: ['#7A53B2'], foregrounds: ['#FFFFFF'] },
+        { name: 'accent3', backgrounds: ['#3D51D4'], foregrounds: ['#FFFFFF'] },
+        { name: 'accent4', backgrounds: ['#82C91E'], foregrounds: ['#304A0B'] },
+        // Subtle appearances
+        { name: 'subtle-primary', backgrounds: ['#DCECF9'], foregrounds: ['#003365'] },
+        { name: 'subtle-secondary', backgrounds: ['#E5E5E5'], foregrounds: ['#1F1F1F'] },
+        { name: 'subtle-success', backgrounds: ['#D7EFDF'], foregrounds: ['#154D26'] },
+        { name: 'subtle-alert', backgrounds: ['#F9E2E2'], foregrounds: ['#631919'] },
+        { name: 'subtle-warning', backgrounds: ['#FFF5C7'], foregrounds: ['#6B4A06'] },
+        { name: 'subtle-accent1', backgrounds: ['#FDE6CE'], foregrounds: ['#743207'] },
+        { name: 'subtle-accent2', backgrounds: ['#E0D8EE'], foregrounds: ['#4E3572'] },
+        { name: 'subtle-accent3', backgrounds: ['#E2E5F9'], foregrounds: ['#1C2561'] },
+        { name: 'subtle-accent4', backgrounds: ['#E3F3CE'], foregrounds: ['#304A0B'] },
+    ],
+    'Button': [
+        { name: 'primary', backgrounds: ['#0070DD'], foregrounds: ['#FFFFFF'] },
+        { name: 'basic', backgrounds: ['#E5E5E5'], foregrounds: ['#1F1F1F'] },
+        { name: 'alert', backgrounds: ['#D93737'], foregrounds: ['#FFFFFF'] },
+        { name: 'transparent', backgrounds: ['transparent', '#FFFFFF', '#F4F4F4'], foregrounds: ['#1F1F1F'] },
+        { name: 'selected', backgrounds: ['#DCECF9'], foregrounds: ['#00509F'] },
+        { name: 'outlined-primary', backgrounds: ['#FFFFFF', 'transparent'], foregrounds: ['#0070DD'] },
+        { name: 'outlined-alert', backgrounds: ['#FFFFFF', 'transparent'], foregrounds: ['#D93737'] },
+    ],
+    'Message': [
+        { name: 'info', backgrounds: ['#EEF6FC'], foregrounds: ['#003365'] },
+        { name: 'success', backgrounds: ['#ECF7F0'], foregrounds: ['#154D26'] },
+        { name: 'alert', backgrounds: ['#FCF1F1'], foregrounds: ['#631919'] },
+        { name: 'warning', backgrounds: ['#FEF3E7'], foregrounds: ['#743207'] },
+    ],
+    'Chip': [
+        { name: 'primary', backgrounds: ['#0070DD'], foregrounds: ['#FFFFFF'] },
+        { name: 'success', backgrounds: ['#2EA843'], foregrounds: ['#FFFFFF'] },
+        { name: 'alert', backgrounds: ['#D93737'], foregrounds: ['#FFFFFF'] },
+        { name: 'warning', backgrounds: ['#FFC208'], foregrounds: ['#6B4A06'] },
+        { name: 'input', backgrounds: ['#E5E5E5'], foregrounds: ['#1F1F1F'] },
+        { name: 'selection', backgrounds: ['#DCECF9'], foregrounds: ['#0070DD'] },
+    ],
+    'Toast': [
+        { name: 'default', backgrounds: ['#1F1F1F'], foregrounds: ['#FFFFFF'] },
+        { name: 'info', backgrounds: ['#0070DD'], foregrounds: ['#FFFFFF'] },
+        { name: 'success', backgrounds: ['#2EA843'], foregrounds: ['#FFFFFF'] },
+        { name: 'alert', backgrounds: ['#D93737'], foregrounds: ['#FFFFFF'] },
+        { name: 'warning', backgrounds: ['#FFC208'], foregrounds: ['#6B4A06'] },
+    ],
+};
+// ============================================
+// COMPONENT DETECTION & VALIDATION
+// ============================================
+function detectComponentType(nodeName) {
+    const lowerName = nodeName.toLowerCase();
+    if (lowerName.includes('badge'))
+        return 'Badge';
+    if (lowerName.includes('button') || lowerName.includes('btn'))
+        return 'Button';
+    if (lowerName.includes('message') || lowerName.includes('inline-message'))
+        return 'Message';
+    if (lowerName.includes('chip') || lowerName.includes('tag'))
+        return 'Chip';
+    if (lowerName.includes('toast') || lowerName.includes('snackbar'))
+        return 'Toast';
+    return undefined;
+}
+function validateComponentColors(componentType, foregroundHex, backgroundHex) {
+    const rules = DS_COMPONENT_RULES[componentType];
+    if (!rules)
+        return { isValid: true };
+    const fgUpper = foregroundHex.toUpperCase();
+    const bgUpper = backgroundHex.toUpperCase();
+    for (const rule of rules) {
+        const bgMatch = rule.backgrounds.some(b => b.toUpperCase() === bgUpper || b === 'transparent');
+        const fgMatch = rule.foregrounds.some(f => f.toUpperCase() === fgUpper);
+        if (bgMatch && fgMatch) {
+            return { isValid: true, matchedAppearance: rule.name };
+        }
+    }
+    // Find closest valid combination for suggestion
+    const validCombos = rules.map(r => `${r.name}: bg=${r.backgrounds[0]}, fg=${r.foregrounds[0]}`).slice(0, 3);
+    return {
+        isValid: false,
+        suggestion: `Invalid ${componentType} color combo. Try: ${validCombos.join(' | ')}`
+    };
+}
+function getSemanticRole(hex) {
+    const mapping = SEMANTIC_COLOR_MAP[hex.toUpperCase()];
+    return mapping === null || mapping === void 0 ? void 0 : mapping.semantic;
+}
+function getTextColorRole(hex) {
+    return TEXT_COLOR_MAP[hex.toUpperCase()];
+}
 const DS_TEXT_SCALES = [
     { id: 'Heading/XXLarge', name: 'Heading/XXLarge', fontSize: 40, fontWeight: 400, isLarge: true },
     { id: 'Heading/XLarge', name: 'Heading/XLarge', fontSize: 32, fontWeight: 600, isLarge: true },
@@ -430,6 +556,11 @@ function processNode(node) {
         return null;
     if (!VISUAL_NODE_TYPES.includes(node.type))
         return null;
+    // Skip divider components - they are decorative and don't need contrast checks
+    const lowerName = node.name.toLowerCase();
+    if (lowerName.includes('divider') || lowerName === 'separator' || lowerName === 'line') {
+        return null;
+    }
     const nodeCategory = getNodeCategory(node.type);
     if (hasComplexFill(node)) {
         return {
@@ -439,6 +570,7 @@ function processNode(node) {
             fontWeight: node.type === 'TEXT' ? getFontWeight(node) : 400,
             isBold: false, isLargeText: false, passesAA: false, passesAAA: false,
             status: 'complex', isDecorative: false, isBrokenColor: false,
+            isValidDSCombination: true,
             message: 'Has gradient or image fill - manual check required'
         };
     }
@@ -482,6 +614,24 @@ function processNode(node) {
             brokenColorReason = 'Passes contrast, but uses off-palette colors.';
         }
     }
+    // DS COMPONENT VALIDATION
+    const detectedComponent = detectComponentType(node.name);
+    let componentAppearance;
+    let isValidDSCombination = true;
+    let dsCombinationIssue;
+    if (detectedComponent && foreground && background) {
+        const validation = validateComponentColors(detectedComponent, foreground.hex, background.hex);
+        isValidDSCombination = validation.isValid;
+        componentAppearance = validation.matchedAppearance;
+        dsCombinationIssue = validation.suggestion;
+        // Mark as warning if invalid DS combo but passes WCAG
+        if (!isValidDSCombination && status === 'pass') {
+            status = 'warning';
+        }
+    }
+    // Get semantic roles for colors
+    const semanticRole = getSemanticRole(foreground.hex);
+    const textColorRole = nodeCategory === 'text' ? getTextColorRole(foreground.hex) : undefined;
     const wcagGuideline = getWcagGuideline(contrastRatio, largeText, nodeCategory === 'text', fontSize);
     return {
         nodeId: node.id, nodeName: node.name, nodeType: node.type, nodeCategory,
@@ -490,7 +640,10 @@ function processNode(node) {
         fontSize, fontWeight, isBold, isLargeText: largeText,
         textScaleName: textScale === null || textScale === void 0 ? void 0 : textScale.name,
         passesAA, passesAAA, status, isDecorative, decorativeReason,
-        isBrokenColor, brokenColorReason, wcagGuideline
+        isBrokenColor, brokenColorReason,
+        detectedComponent, componentAppearance, isValidDSCombination, dsCombinationIssue,
+        semanticRole, textColorRole,
+        wcagGuideline
     };
 }
 function traverseNodes(node, results) {
@@ -569,10 +722,15 @@ function generateColorMatrix(uniqueColors, sourceName, results) {
 // ============================================
 // MAIN PLUGIN
 // ============================================
-figma.showUI(__html__, { width: 900, height: 750 });
+figma.showUI(__html__, { width: 400, height: 600, themeColors: true });
 let lastResults = [];
 let lastSourceName = '';
 figma.ui.onmessage = async (msg) => {
+    // Handle resize message
+    if (msg.type === 'resize' && msg.width && msg.height) {
+        figma.ui.resize(msg.width, msg.height);
+        return;
+    }
     if (msg.type === 'scan') {
         // ... (existing scan code) ...
         const selection = figma.currentPage.selection;

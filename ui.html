@@ -738,6 +738,29 @@
       font-weight: 500;
     }
 
+    .component-info {
+      font-size: var(--font-size-xs);
+      color: var(--figma-color-brand);
+      margin-top: var(--space-xs);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .component-info.invalid {
+      color: var(--figma-color-warning);
+    }
+
+    .badge-component {
+      background: rgba(13, 153, 255, 0.15);
+      color: var(--figma-color-brand);
+    }
+
+    .badge-ds-issue {
+      background: var(--figma-color-warning-bg);
+      color: var(--figma-color-warning);
+    }
+
     .complex-message {
       font-size: var(--font-size-sm);
       color: var(--figma-color-complex);
@@ -913,6 +936,28 @@
       overflow-y: auto;
       padding: var(--space-md);
     }
+
+    /* Resize Handle */
+    .resize-handle {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      width: 16px;
+      height: 16px;
+      cursor: nwse-resize;
+      z-index: 1000;
+    }
+
+    .resize-handle::before {
+      content: '';
+      position: absolute;
+      right: 3px;
+      bottom: 3px;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--figma-color-border-strong);
+      border-bottom: 2px solid var(--figma-color-border-strong);
+    }
   </style>
 </head>
 
@@ -950,6 +995,7 @@
         <button class="chip" data-status="warning"><span class="chip-dot warning"></span>Warning</button>
         <button class="chip" data-status="pass"><span class="chip-dot pass"></span>Pass</button>
         <button class="chip" data-status="complex"><span class="chip-dot complex"></span>Complex</button>
+        <button class="chip" data-status="ds-issue"><span class="chip-dot warning"></span>DS Issues</button>
       </div>
     </div>
   </div>
@@ -1016,6 +1062,38 @@
 
   <!-- Matrix Tooltip -->
   <div class="tooltip" id="tooltip"></div>
+
+  <!-- Resize Handle -->
+  <div class="resize-handle" id="resizeHandle"></div>
+
+  <script>
+    // Resize functionality
+    const resizeHandle = document.getElementById('resizeHandle');
+    let isResizing = false;
+    let startX, startY, startWidth, startHeight;
+
+    resizeHandle.addEventListener('mousedown', (e) => {
+      isResizing = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      startWidth = window.innerWidth;
+      startHeight = window.innerHeight;
+      document.body.style.cursor = 'nwse-resize';
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isResizing) return;
+      const newWidth = Math.max(320, startWidth + (e.clientX - startX));
+      const newHeight = Math.max(400, startHeight + (e.clientY - startY));
+      parent.postMessage({ pluginMessage: { type: 'resize', width: newWidth, height: newHeight } }, '*');
+    });
+
+    document.addEventListener('mouseup', () => {
+      isResizing = false;
+      document.body.style.cursor = '';
+    });
+  </script>
 
   <script>
     let allResults = [];
@@ -1320,7 +1398,12 @@
     function renderResults() {
       let filtered = allResults;
       if (currentTypeFilter !== 'all') filtered = filtered.filter(r => r.nodeCategory === currentTypeFilter);
-      if (currentStatusFilter !== 'all') filtered = filtered.filter(r => r.status === currentStatusFilter);
+      if (currentStatusFilter === 'ds-issue') {
+        // Filter for DS component issues (invalid combos or broken colors)
+        filtered = filtered.filter(r => !r.isValidDSCombination || r.isBrokenColor);
+      } else if (currentStatusFilter !== 'all') {
+        filtered = filtered.filter(r => r.status === currentStatusFilter);
+      }
       if (filtered.length === 0 && allResults.length > 0) { resultsList.innerHTML = '<div class="no-results">No results match current filters</div>'; return; }
       resultsList.innerHTML = filtered.map(createResultItem).join('');
       resultsList.querySelectorAll('.result-item').forEach(item => {
@@ -1329,7 +1412,7 @@
     }
 
     function createResultItem(result) {
-      const { nodeId, nodeName, nodeCategory, foreground, background, contrastRatio, passesAA, passesAAA, status, fontSize, fontWeight, isBold, isLargeText, textScaleName, isDecorative, decorativeReason, message, wcagGuideline, isBrokenColor, brokenColorReason } = result;
+      const { nodeId, nodeName, nodeCategory, foreground, background, contrastRatio, passesAA, passesAAA, status, fontSize, fontWeight, isBold, isLargeText, textScaleName, isDecorative, decorativeReason, message, wcagGuideline, isBrokenColor, brokenColorReason, detectedComponent, componentAppearance, isValidDSCombination, dsCombinationIssue, semanticRole, textColorRole } = result;
       const categoryLabel = { 'text': 'TEXT', 'shape': 'SHAPE', 'frame': 'FRAME', 'other': 'OTHER' }[nodeCategory] || 'OTHER';
 
       if (status === 'complex') {
@@ -1359,6 +1442,26 @@
       let decorativeInfo = isDecorative && decorativeReason ? `<div class="decorative-info">💡 ${decorativeReason}</div>` : '';
       let brokenInfo = isBrokenColor && brokenColorReason ? `<div class="broken-info">⚠ Off-Palette: ${brokenColorReason}</div>` : '';
 
+      // Component validation info
+      let componentInfo = '';
+      if (detectedComponent) {
+        if (isValidDSCombination && componentAppearance) {
+          componentInfo = `<div class="component-info">✓ ${detectedComponent}/${componentAppearance}</div>`;
+        } else if (!isValidDSCombination && dsCombinationIssue) {
+          componentInfo = `<div class="component-info invalid">⚠ ${dsCombinationIssue}</div>`;
+        } else {
+          componentInfo = `<div class="component-info">🔍 Detected: ${detectedComponent}</div>`;
+        }
+      }
+
+      // Semantic role info for text
+      let semanticInfo = '';
+      if (textColorRole) {
+        semanticInfo = `<div class="component-info">Text: --${textColorRole}</div>`;
+      } else if (semanticRole) {
+        semanticInfo = `<div class="component-info">Role: --${semanticRole}</div>`;
+      }
+
       let wcagInfo = '';
       if (wcagGuideline) {
         const recHtml = wcagGuideline.recommendation ? `<div class="wcag-recommendation">${wcagGuideline.recommendation}</div>` : '';
@@ -1366,6 +1469,14 @@
       }
 
       let badgesHtml = '';
+      // Component badge
+      if (detectedComponent && isValidDSCombination && componentAppearance) {
+        badgesHtml += `<span class="badge badge-component">${detectedComponent}</span> `;
+      }
+      // DS issue badge
+      if (detectedComponent && !isValidDSCombination) {
+        badgesHtml += `<span class="badge badge-ds-issue">DS Issue</span> `;
+      }
       if (isBrokenColor) {
         badgesHtml += `<span class="badge badge-broken">Off-Palette</span> `;
       }
@@ -1384,7 +1495,7 @@
             ${badgesHtml}
           </div>
         </div>
-        ${textInfo}${decorativeInfo}${brokenInfo}${wcagInfo}
+        ${textInfo}${decorativeInfo}${brokenInfo}${componentInfo}${semanticInfo}${wcagInfo}
       </div>`;
     }
 
